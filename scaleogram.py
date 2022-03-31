@@ -1,5 +1,9 @@
+import numpy as np
+from ssqueezepy import cwt
+from ssqueezepy.visuals import plot, imshow
 import os
 
+import numpy
 import numpy as np
 import pywt
 import pandas as pd
@@ -156,7 +160,8 @@ def dwt_plot(stress):
 
 
 def cwt_plot(stress):
-    scales = scg.periods2scales(np.arange(1, 1000))
+    scales = np.arange(1, len(stress))
+    print(scales)
     wavelet = "cmor1-3"
     scg.set_default_wavelet(wavelet)
     # and the scaleogram
@@ -165,9 +170,12 @@ def cwt_plot(stress):
 
 
 data = ExperimentalDataLoader("StressStrainTension.csv", decimal=',', delimiter=";", encoding="cp1251")
+time = data.csv_data["Общее время (s)"].values
 stress = data.csv_data["Напряжение(8800 (0,1):Нагрузка) (MPa)"].values
-
-dwt_plot(stress)
-cwt_plot(stress)
-
-
+# stress = numpy.sin([2 * numpy.pi * t / 50 for t in range(2000)]) + numpy.sin([2 * numpy.pi * t / 200 for t in range(2000)])
+plot(stress, title="S(t)", show=1)
+Wx, scales = cwt(stress, "hhhat")
+print(scales)
+imshow(Wx, yticks=scales, abs=1,
+       title="abs(CWT)",
+       ylabel="scales", xlabel="samples", )
