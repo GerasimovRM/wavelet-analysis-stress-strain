@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 from ssqueezepy import cwt
 from ssqueezepy.visuals import plot, imshow
@@ -9,9 +11,9 @@ import pywt
 import pandas as pd
 import csv
 import matplotlib.pyplot as plt
-from multiprocessing import Process
 import scaleogram as scg
 from matplotlib.figure import Figure
+
 
 WORK_PATH = os.path.abspath(os.getcwd())
 
@@ -170,12 +172,33 @@ def cwt_plot(stress):
 
 
 data = ExperimentalDataLoader("StressStrainTension.csv", decimal=',', delimiter=";", encoding="cp1251")
-time = data.csv_data["Общее время (s)"].values
-stress = data.csv_data["Напряжение(8800 (0,1):Нагрузка) (MPa)"].values
-# stress = numpy.sin([2 * numpy.pi * t / 50 for t in range(2000)]) + numpy.sin([2 * numpy.pi * t / 200 for t in range(2000)])
-plot(stress, title="S(t)", show=1)
+while True:
+    print("Select first column:")
+    for i, col in enumerate(data.csv_data.columns):
+        print(i, col)
+    first_col_index = int(input())
+    try:
+        first_col = data.csv_data.columns[first_col_index]
+    except IndexError:
+        continue
+    break
+
+while True:
+    print("Select second column:")
+    for i, col in enumerate(data.csv_data.columns):
+        print(i, col)
+    second_col_index = int(input())
+    try:
+        second_col = data.csv_data.columns[second_col_index]
+    except IndexError:
+        continue
+    break
+
+time = data.csv_data[first_col].values
+stress = data.csv_data[second_col].values
+plot(stress, title="S(t)")
 Wx, scales = cwt(stress, "hhhat")
-print(scales)
 imshow(Wx, yticks=scales, abs=1,
        title="abs(CWT)",
-       ylabel="scales", xlabel="samples", )
+       ylabel="scales", xlabel="samples")
+sys.exit(0)
