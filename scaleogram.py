@@ -19,7 +19,8 @@ class ExperimentalDataLoader:
         return self.csv_data
 
 
-data = ExperimentalDataLoader("Tube-15.csv", decimal=',', delimiter=";", encoding="cp1251")
+filename = input("Select file:")
+data = ExperimentalDataLoader(filename, decimal=',', delimiter=";", encoding="cp1251")
 while True:
     print("Выберите первый столбец:")
     for i, col in enumerate(data.csv_data.columns):
