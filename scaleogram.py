@@ -21,7 +21,7 @@ class ExperimentalDataLoader:
 
 data = ExperimentalDataLoader("Tube-15.csv", decimal=',', delimiter=";", encoding="cp1251")
 while True:
-    print("Select first column:")
+    print("Выберите первый столбец:")
     for i, col in enumerate(data.csv_data.columns):
         print(i, col)
     first_col_index = int(input())
@@ -30,6 +30,19 @@ while True:
     except IndexError:
         continue
     break
+column_1 = data.csv_data[first_col].values.astype(float)
+print(f"Диапазон первого столбца: {min(column_1)} - {max(column_1)}")
+print("Хотите взять весь диапазон? (y/n)")
+answer = input().lower()
+
+if answer in ("y", "yes", "да", "д"):
+    start_index, finish_index = 0, len(column_1)
+else:
+    print("Выберите диапазон отображения (два числа через пробел):")
+    start, end = map(float, input().split())
+    data_row = list(filter(lambda x: start <= x[1] <= end, enumerate(column_1)))
+    start_index, finish_index = data_row[0][0], data_row[-1][0]
+column_1 = column_1[start_index: finish_index]
 
 while True:
     print("Select second column:")
@@ -41,20 +54,19 @@ while True:
     except IndexError:
         continue
     break
+column_2 = data.csv_data[second_col].values.astype(float)[start_index: finish_index]
 
-time = data.csv_data[first_col].values.astype(float)[290:610]
-stress = data.csv_data[second_col].values.astype(float)[290:610]
-data = numpy.array([time, stress])
+data = numpy.array([column_1, column_2])
 print(data.shape, data.ndim)
-print(time)
-print(stress)
+print(column_1)
+print(column_2)
 
-plot(time, stress, xlabel="Общее время, сек", ylabel="Осевое напряжение, МПа", show=1)
+plot(column_1, column_2, xlabel="Общее время, сек", ylabel="Осевое напряжение, МПа", show=1)
 Wx, scales = cwt(data, scales="log-piecewise")
 imshow(Wx[1], yticks=scales, abs=1,
        title="|W(a, b)|, МПа",
-       ylabel="Масштаб а", xlabel="Сдвиг b, мм",
-       xticks=time,
+       ylabel="Масштаб а", xlabel=first_col,
+       xticks=column_1,
        cmap="turbo"
        )
 
